@@ -1,0 +1,107 @@
+<div class="form-page">
+  <a class="back-link" routerLink="/tasks">&larr; Back to tasks</a>
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">ONE STEP AT A TIME</p>
+      <h1>{{ id ? 'Refine the next step.' : 'What’s next?' }}</h1>
+      <p class="subtitle">
+        {{
+          id
+            ? 'Update the details and keep your work moving.'
+            : 'Give your task a name. The rest can follow.'
+        }}
+      </p>
+    </div>
+  </div>
+  <section class="panel form-panel" [attr.aria-busy]="loading() || saving()">
+    <h2>{{ id ? 'Edit task' : 'Create a task' }}</h2>
+    @if (error()) {
+      <div class="error-banner" role="alert">
+        {{ error() }}
+        @if (!loaded()) {
+          <button class="text-button" (click)="load()">Retry</button>
+        }
+      </div>
+    }
+    @if (loading()) {
+      <p role="status">Loading task details...</p>
+    }
+    @if (loaded()) {
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <fieldset [disabled]="saving()">
+          <legend class="sr-only">Task details</legend>
+          <div class="field">
+            <label for="title">Title <span class="required">*</span></label
+            ><input
+              id="title"
+              formControlName="title"
+              placeholder="e.g. Prepare the project walkthrough"
+              required
+              [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid"
+              aria-describedby="title-help"
+            />
+            <p
+              id="title-help"
+              [class.field-error]="form.controls.title.touched && form.controls.title.invalid"
+            >
+              {{
+                form.controls.title.touched && form.controls.title.invalid
+                  ? 'Enter a title between 1 and 150 characters.'
+                  : 'Required. Keep it clear and actionable, up to 150 characters.'
+              }}
+            </p>
+          </div>
+          <div class="field">
+            <label for="description">Description <span class="optional">Optional</span></label
+            ><textarea
+              id="description"
+              formControlName="description"
+              rows="5"
+              placeholder="Add context, details, or a definition of done..."
+              aria-describedby="description-help"
+              [attr.aria-invalid]="
+                form.controls.description.touched && form.controls.description.invalid
+              "
+            ></textarea>
+            <p
+              id="description-help"
+              [class.field-error]="
+                form.controls.description.touched && form.controls.description.invalid
+              "
+            >
+              {{ form.controls.description.value.length }} / 2,000 characters
+            </p>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="status">Status</label
+              ><select id="status" formControlName="status">
+                <option value="Todo">To do</option>
+                <option value="InProgress">In progress</option>
+                <option value="Done">Done</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="priority">Priority</label
+              ><select id="priority" formControlName="priority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="dueDate">Due date <span class="optional">Optional</span></label
+              ><input id="dueDate" type="date" formControlName="dueDate" />
+            </div>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <a routerLink="/tasks" class="button secondary">Cancel</a
+          ><button type="submit" class="button primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : id ? 'Save changes' : 'Create task' }}
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+</div>

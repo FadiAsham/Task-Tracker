@@ -1,0 +1,26 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+.vs/
+.env
+.local/
+TestResults/
+**/appsettings.Local.json
+**/test-results/
+**/playwright-report/
+
+# Frontend build artifacts and local tooling
+/frontend/tmp/
+/frontend/out-tsc/
+/frontend/bazel-out/
+/frontend/typings/
+**/.sass-cache/
+**/__screenshots__/
+**/.history/
+**/.idea/
+*.log
+.DS_Store
+Thumbs.db

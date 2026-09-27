@@ -1,0 +1,33 @@
+<section class="form-page" [attr.aria-busy]="loading()">
+  <a class="back-link" routerLink="/tasks">&larr; Back to tasks</a>
+  @if (loading()) {
+    <div class="empty-state" role="status"><span class="spinner" aria-hidden="true"></span><p>Loading task...</p></div>
+  } @else if (error()) {
+    <div class="error-banner" role="alert">
+      {{ error() }} <button type="button" class="text-button" (click)="retry()">Try again</button>
+    </div>
+  } @else if (task(); as item) {
+    <article class="panel form-panel">
+      <div class="detail-heading">
+        <div><p class="eyebrow">TASK DETAILS</p><h1>{{ item.title }}</h1></div>
+        <a class="icon-button" [routerLink]="['/tasks', item.id, 'edit']" [attr.aria-label]="'Edit ' + item.title" title="Edit task">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5L8 21H3v-5L16 3Zm-3 3 5 5"/></svg>
+        </a>
+      </div>
+      <dl class="task-metadata">
+        <div><dt>Created by</dt><dd>{{ item.createdByName || 'Unknown' }}</dd></div>
+        <div><dt>Status</dt><dd><span [class]="'badge ' + item.status">{{ labels[item.status] }}</span></dd></div>
+        <div><dt>Priority</dt><dd>{{ item.priority }}</dd></div>
+        <div><dt>Due date</dt><dd>{{ item.dueDate ? (item.dueDate | date: 'MMM d, y') : 'No due date' }}</dd></div>
+      </dl>
+      <h2>Description</h2>
+      <p class="full-description">{{ item.description || 'No description' }}</p>
+      <dl class="task-metadata">
+        <div><dt>Created (UTC)</dt><dd>{{ item.createdAt | date: 'MMM d, y, HH:mm' : 'UTC' }}</dd></div>
+        <div><dt>Updated (UTC)</dt><dd>{{ item.updatedAt | date: 'MMM d, y, HH:mm' : 'UTC' }}</dd></div>
+      </dl>
+      <dl><dt>Task ID</dt><dd class="task-id">{{ item.id }}</dd></dl>
+    </article>
+  }
+</section>
+

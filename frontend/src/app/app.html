@@ -1,0 +1,28 @@
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a routerLink="/tasks" class="brand"><span class="brand-mark" aria-hidden="true">&#10003;</span>Task<span>Tracker</span></a>
+  @if (session()?.authenticated) {
+    <div class="session-controls">
+      <span>{{ session()?.name }}</span>
+      <button type="button" (click)="auth.logout(session()!.csrfToken)">Sign out</button>
+    </div>
+  }
+</header>
+<main id="main" tabindex="-1">
+  @if (loading()) {
+    <p role="status">Checking your session...</p>
+  } @else {
+    @if (error()) {
+      <p role="alert">{{ error() }}</p>
+      <button type="button" (click)="refreshSession()">Retry</button>
+    }
+    @if (session()?.authenticated) {
+      <router-outlet />
+    } @else if (session()) {
+      <h1>Welcome to TaskTracker</h1>
+      <p>Sign in to view and manage shared tasks.</p>
+      <button type="button" (click)="auth.login()">Sign in with Keycloak</button>
+    }
+  }
+</main>
+<footer><span>ASP.NET Core &middot; Angular &middot; PostgreSQL</span></footer>

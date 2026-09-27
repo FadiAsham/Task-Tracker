@@ -1,0 +1,136 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">YOUR WORK, ORGANIZED</p>
+    <h1>Make room for progress.</h1>
+  </div>
+  <a class="button primary" routerLink="/tasks/new"><span aria-hidden="true">+</span> New task</a>
+</section>
+<section class="panel" aria-labelledby="list-title" [attr.aria-busy]="loading()">
+  <div class="toolbar">
+    <div>
+      <h2 id="list-title">
+        Your tasks <span class="count">{{ data()?.totalCount ?? '-' }}</span>
+      </h2>
+    </div>
+    <div class="filter">
+      <label for="status-filter">Status</label
+      ><select
+        id="status-filter"
+        [value]="status"
+        (change)="filter($any($event.target).value)"
+        [disabled]="!!deleting()"
+      >
+        <option value="">All statuses</option>
+        <option value="Todo">To do</option>
+        <option value="InProgress">In progress</option>
+        <option value="Done">Done</option>
+      </select>
+    </div>
+  </div>
+  @if (notice()) {
+    <p class="notice" role="status">{{ notice() }}</p>
+  }
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      {{ error() }} <button class="text-button" (click)="reload()">Refresh tasks</button>
+    </div>
+  }
+  @if (loading()) {
+    <div class="empty-state" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Loading your tasks...</p>
+    </div>
+  } @else if (data(); as result) {
+    @if (result.items.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon" aria-hidden="true">&#10003;</span>
+        <h3>{{ status ? 'No tasks with this status' : 'A fresh start.' }}</h3>
+
+        <a class="button secondary" routerLink="/tasks/new">Create a task</a>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Task</th>
+              <th scope="col">Created by</th><th scope="col">Status</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Due date</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (task of result.items; track task.id) {
+              <tr>
+                <td class="task-cell">
+                  <a [routerLink]="['/tasks', task.id, 'edit']" class="task-title">{{
+                    task.title
+                  }}</a>
+                  <p>{{ task.description || 'No description' }}</p>
+                </td><td class="creator-cell">{{ task.createdByName || 'Unknown' }}</td>
+                <td>
+                  <span class="badge" [class]="'badge ' + task.status">{{
+                    labels[task.status]
+                  }}</span>
+                </td>
+                <td>
+                  <span class="priority" [class.high]="task.priority === 'High'"
+                    ><span aria-hidden="true">&#9679;</span> {{ task.priority }}</span
+                  >
+                </td>
+                <td class="due-date">
+                  {{ task.dueDate ? (task.dueDate | date: 'MMM d, y') : 'No due date' }}
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <a class="icon-button" [routerLink]="['/tasks', task.id]"
+                      [attr.aria-label]="'View ' + task.title" title="View full task">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </a>
+                    <a class="icon-button" [routerLink]="['/tasks', task.id, 'edit']"
+                      [attr.aria-label]="'Edit ' + task.title" title="Edit task">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5L8 21H3v-5L16 3Zm-3 3 5 5"/></svg>
+                    </a>
+                    <button type="button" class="icon-button danger" (click)="remove(task)"
+                      [disabled]="!!deleting()" [attr.aria-label]="(deleting() === task.id ? 'Deleting ' : 'Delete ') + task.title"
+                      [attr.aria-busy]="deleting() === task.id" title="Delete task">
+                      @if (deleting() === task.id) {
+                        <span class="spinner" aria-hidden="true"></span>
+                      } @else {
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>
+                      }
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    <div class="pagination">
+      <span
+        >{{ result.totalCount }} {{ result.totalCount === 1 ? 'task' : 'tasks' }} &middot; Page
+        {{ page }} of {{ pageCount }}</span
+      >
+      <div>
+        <button
+          class="button small secondary"
+          (click)="go(page - 1)"
+          [disabled]="page <= 1 || !!deleting()"
+        >
+          Previous</button
+        ><button
+          class="button small secondary"
+          (click)="go(page + 1)"
+          [disabled]="page >= pageCount || !!deleting()"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  }
+</section>
+
+
